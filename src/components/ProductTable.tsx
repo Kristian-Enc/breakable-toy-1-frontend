@@ -1,3 +1,5 @@
+/* THIS COMPONENT IS PRODUCING AN ERROR IN THE CONSOLE, DON'T FORGET TO CHECK IT */
+
 import React, { useState, useEffect } from 'react'
 import { productService } from '../services/productService';
 import { Product } from '../types/Product';
@@ -18,6 +20,8 @@ const ProductTable = () => {
       
 
       return (
+      <div>
+        <h2>Inventory Products</h2>
         <table>
           <thead>
             <tr>
@@ -28,7 +32,6 @@ const ProductTable = () => {
               <th>Expiration Date</th>
               <th>Stock</th>
               <th>Actions</th>
-
             </tr>
           </thead>
           <tbody>
@@ -45,6 +48,7 @@ const ProductTable = () => {
             ))}
           </tbody>
         </table>
+      </div>
       );
       
 }
