@@ -4,21 +4,30 @@ import React, { useState, useEffect } from 'react'
 import { productService } from '../services/productService';
 import { Product } from '../types/Product';
 
-const ProductTable = () => {
-    
-    const [products, setProducts] = useState<Product[]>([]);
+type Props = {
+    products: Product[];
+  };
 
-    useEffect(() => {
-        productService.getAll()
-          .then(data => {
-            setProducts(data);
-          })
-          .catch(error => {
-            console.error('Failed to fetch products:', error);
-          });
-      }, []);
+const ProductTable = ({products}: Props) => {
+
+      const handleCheckboxChange = async (product: Product) => {
+        try {
+          if (product.quantityInStock === 0) {
+            // If already out of stock mark it as in stock
+            await productService.markInStock(product.id);
+          } else {
+            // If in stock mark it as out of stock
+            await productService.markOutOfStock(product.id);
+          }
       
-
+          // After update, fetch new data
+                    //const updatedProducts = await productService.getAll();
+                    //setProducts(updatedProducts);
+        } catch (error) {
+          console.error("Error updating stock:", error);
+        }
+      };
+      
       return (
       <div>
         <h2>Inventory Products</h2>
@@ -37,7 +46,13 @@ const ProductTable = () => {
           <tbody>
             {products.map(product => (
               <tr key={product.id}>
-                <td><input type="checkbox"/></td>
+                <td>
+                    <input
+                        type="checkbox"
+                        checked={product.quantityInStock === 0}
+                        onChange={() => handleCheckboxChange(product)}
+                    />
+                </td>
                 <td>{product.category}</td>
                 <td>{product.name}</td>
                 <td>${product.unitPrice.toFixed(2)}</td> {/* DON'T FORGET TO CHECK THAT THIS WORKS WELL!!! */}

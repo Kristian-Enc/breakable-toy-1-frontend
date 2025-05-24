@@ -9,5 +9,16 @@ export const productService = {
       throw new Error('Failed to fetch products');
     }
     return response.json();
+  },
+
+  async markOutOfStock(id: number): Promise<void> {
+    const response = await fetch(`${baseUrl}/${id}/outofstock`, { method: 'PUT' });
+    if (!response.ok) throw new Error('Failed to mark out of stock');
+  },
+  
+  async markInStock(id: number): Promise<void> {
+    const response = await fetch(`${baseUrl}/${id}/instock`, { method: 'PUT' });
+    if (!response.ok) throw new Error('Failed to mark in stock');
   }
+  
 };
