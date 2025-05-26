@@ -1,11 +1,17 @@
-import React from 'react'
+import React from 'react';
 
-const NewProductButton = () => {
+type Props = {
+  onClick: () => void;
+};
+
+const NewProductButton = ({ onClick }: Props) => {
   return (
     <div>
-        <button type='button'>New Product</button>
+      <button type="button" onClick={onClick}>
+        New Product
+      </button>
     </div>
-  )
-}
+  );
+};
 
-export default NewProductButton
+export default NewProductButton;

@@ -10,14 +10,14 @@ type Props = {
 };
 
 
-const FilterBar = ({ 
-    onSearchByName, 
-    categories, 
-    selectedCategory, 
+const FilterBar = ({
+    onSearchByName,
+    categories,
+    selectedCategory,
     onCategoryChange,
     selectedAvailability,
     onAvailabilityChange
-    }: Props) => {
+}: Props) => {
     const [searchName, setSearchName] = useState('');
 
     return (
@@ -55,10 +55,10 @@ const FilterBar = ({
                     <select
                         value={selectedAvailability}
                         onChange={(e) => onAvailabilityChange(e.target.value)}
-                        >
-    <option value="All">All</option>
-    <option value="Available">Available</option>
-    <option value="Not Available">Not Available</option>
+                    >
+                        <option value="All">All</option>
+                        <option value="Available">Available</option>
+                        <option value="Not Available">Not Available</option>
                     </select>
                 </label>
             </div>
