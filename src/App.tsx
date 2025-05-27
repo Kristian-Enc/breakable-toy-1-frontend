@@ -10,7 +10,7 @@ import ProductForm from "./components/ProductForm";
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  //const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [nameFilter, setNameFilter] = useState('');
@@ -26,30 +26,23 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       try {
+        const filters = {
+          name: nameFilter,
+          category: selectedCategory,
+          availability: availabilityFilter,
+        };
+  
         const [data, totalCount] = await Promise.all([
-          productService.getAll(currentPage, pageSize),
-          productService.getTotalCount()
+          productService.getAll(currentPage, pageSize, filters),
+          productService.getTotalCount() // (optional: update this later to match filters)
         ]);
   
         setProducts(data);
-  
-        const filtered = data.filter(p => {
-          const matchesName = p.name.toLowerCase().includes(nameFilter.toLowerCase());
-          const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-          const matchesAvailability =
-            availabilityFilter === 'All' ||
-            (availabilityFilter === 'Available' && p.quantityInStock > 0) ||
-            (availabilityFilter === 'Not Available' && p.quantityInStock === 0);
-  
-          return matchesName && matchesCategory && matchesAvailability;
-        });
-  
-        setFilteredProducts(filtered);
-  
         const allCategories = Array.from(new Set(data.map(p => p.category)));
         setCategoryOptions(allCategories);
   
-        setTotalPages(Math.ceil(totalCount / pageSize));
+        const totalPages = Math.ceil(totalCount / pageSize);
+        setTotalPages(totalPages);
       } catch (err) {
         console.error('Error fetching products', err);
       }
@@ -61,20 +54,20 @@ function App() {
 
 
 
-  const applyFilters = () => {
-    const filtered = products.filter(p => {
-      const matchesName = p.name.toLowerCase().includes(nameFilter.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-      const matchesAvailability =
-        availabilityFilter === 'All' ||
-        (availabilityFilter === 'Available' && p.quantityInStock > 0) ||
-        (availabilityFilter === 'Not Available' && p.quantityInStock === 0);
+  // const applyFilters = () => {
+  //   const filtered = products.filter(p => {
+  //     const matchesName = p.name.toLowerCase().includes(nameFilter.toLowerCase());
+  //     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+  //     const matchesAvailability =
+  //       availabilityFilter === 'All' ||
+  //       (availabilityFilter === 'Available' && p.quantityInStock > 0) ||
+  //       (availabilityFilter === 'Not Available' && p.quantityInStock === 0);
 
-      return matchesName && matchesCategory && matchesAvailability;
-    });
+  //     return matchesName && matchesCategory && matchesAvailability;
+  //   });
 
-    setFilteredProducts(filtered);
-  };
+  //   setFilteredProducts(filtered);
+  // };
 
 
   return (
@@ -82,23 +75,23 @@ function App() {
       <FilterBar
         onSearchByName={(name: string) => {
           setNameFilter(name);
-          applyFilters();
+          //applyFilters();
         }}
         categories={categoryOptions}
         selectedCategory={selectedCategory}
         onCategoryChange={(selected: string) => {
           setSelectedCategory(selected);
-          applyFilters();
+          //applyFilters();
         }}
         selectedAvailability={availabilityFilter}
         onAvailabilityChange={(selected: string) => {
           setAvailabilityFilter(selected);
-          applyFilters();
+          //applyFilters();
         }}
       />
       <NewProductButton onClick={() => setShowForm(true)} />
       <ProductTable
-        products={filteredProducts}
+        products={products}
         onToggleStock={async (product) => {
           try {
             if (product.id === undefined) return;
@@ -115,7 +108,7 @@ function App() {
             ]);
 
             setProducts(updated);
-            setFilteredProducts(updated);
+            //setFilteredProducts(updated);
             setTotalPages(Math.ceil(totalCount / pageSize));
           } catch (error) {
             console.error("Failed to toggle stock:", error);
@@ -134,7 +127,7 @@ function App() {
             ]);
 
             setProducts(updated);
-            setFilteredProducts(updated);
+            //setFilteredProducts(updated);
             setTotalPages(Math.ceil(totalCount / pageSize));
 
           } catch (error) {
@@ -173,7 +166,7 @@ function App() {
                 );
                 
                 setProducts(updatedList);
-                setFilteredProducts(updatedList);
+                //setFilteredProducts(updatedList);
               } else {
                 // Create mode
                 const created = await productService.create({
@@ -191,7 +184,7 @@ function App() {
                 } else {
                   const updated = await productService.getAll(currentPage, pageSize);
                   setProducts(updated);
-                  setFilteredProducts(updated);
+                  //setFilteredProducts(updated);
                 }
                 setTotalPages(newTotalPages);
 

@@ -5,10 +5,27 @@ import { InventoryMetrics } from "../types/InventoryMetrics";
 const baseUrl = "http://localhost:9090/products";
 
 export const productService = {
-  async getAll(page: number = 0, size: number = 10): Promise<Product[]> {
-    const response = await fetch(`${baseUrl}?page=${page}&size=${size}`);  
+  async getAll(
+    page: number = 0,
+    size: number = 10,
+    filters: { name?: string; category?: string; availability?: string } = {}
+  ): Promise<Product[]> {
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    params.append("size", size.toString());
+  
+    if (filters.name) params.append("name", filters.name);
+    if (filters.category && filters.category !== "All") {
+      params.append("category", filters.category);
+    }
+    if (filters.availability && filters.availability !== "All") {
+      const isAvailable = filters.availability === "Available";
+      params.append("availability", String(isAvailable));
+    }
+  
+    const response = await fetch(`${baseUrl}?${params}`);
     if (!response.ok) {
-      throw new Error('Failed to fetch products');
+      throw new Error("Failed to fetch products");
     }
     return response.json();
   },
