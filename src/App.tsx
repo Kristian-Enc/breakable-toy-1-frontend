@@ -21,7 +21,15 @@ function App() {
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize] = useState(10);
 
+  // New states for sorting
+  const [sortBy, setSortBy] = useState<string>('id');
+  const [sortDir, setSortDir] = useState<string>('asc');
 
+  const handleSortChange = (field: string, direction: 'asc' | 'desc') => {
+    setSortBy(field);
+    setSortDir(direction);
+  };
+  
 
   useEffect(() => {
     async function fetchData() {
@@ -31,28 +39,25 @@ function App() {
           category: selectedCategory,
           availability: availabilityFilter,
         };
-  
+
         const [data, totalCount] = await Promise.all([
-          productService.getAll(currentPage, pageSize, filters),
+          productService.getAll(currentPage, pageSize, filters, sortBy, sortDir),
           productService.getTotalCount() // (optional: update this later to match filters)
         ]);
-  
+
         setProducts(data);
         const allCategories = Array.from(new Set(data.map(p => p.category)));
         setCategoryOptions(allCategories);
-  
+
         const totalPages = Math.ceil(totalCount / pageSize);
         setTotalPages(totalPages);
       } catch (err) {
         console.error('Error fetching products', err);
       }
     }
-  
+
     fetchData();
-  }, [currentPage, pageSize, nameFilter, selectedCategory, availabilityFilter]);
-  
-
-
+  }, [currentPage, pageSize, nameFilter, selectedCategory, availabilityFilter, sortBy, sortDir]);
 
   // const applyFilters = () => {
   //   const filtered = products.filter(p => {
@@ -68,7 +73,6 @@ function App() {
 
   //   setFilteredProducts(filtered);
   // };
-
 
   return (
     <div>
@@ -103,7 +107,7 @@ function App() {
             }
 
             const [updated, totalCount] = await Promise.all([
-              productService.getAll(currentPage, pageSize),
+              productService.getAll(currentPage, pageSize, { name: nameFilter, category: selectedCategory, availability: availabilityFilter }, sortBy, sortDir),
               productService.getTotalCount()
             ]);
 
@@ -122,7 +126,7 @@ function App() {
           try {
             await productService.delete(id);
             const [updated, totalCount] = await Promise.all([
-              productService.getAll(currentPage, pageSize),
+              productService.getAll(currentPage, pageSize, { name: nameFilter, category: selectedCategory, availability: availabilityFilter }, sortBy, sortDir),
               productService.getTotalCount()
             ]);
 
@@ -134,6 +138,12 @@ function App() {
             console.error("Error deleting product:", error);
           }
         }}
+        sortBy={sortBy}
+        sortDir={sortDir}
+        setSortBy={setSortBy}
+        setSortDir={setSortDir}
+        onSortChange={handleSortChange}
+
       />
 
       <Pagination
@@ -141,7 +151,6 @@ function App() {
         totalPages={totalPages}
         onPageChange={(newPage: number) => setCurrentPage(newPage)}
       />
-
 
       <Metrics />
       {showForm && (
@@ -164,7 +173,7 @@ function App() {
                 const updatedList = products.map(p =>
                   p.id === updated.id ? updated : p
                 );
-                
+
                 setProducts(updatedList);
                 //setFilteredProducts(updatedList);
               } else {
@@ -182,7 +191,7 @@ function App() {
                 if (products.length === pageSize) {
                   setCurrentPage(newTotalPages - 1);
                 } else {
-                  const updated = await productService.getAll(currentPage, pageSize);
+                  const updated = await productService.getAll(currentPage, pageSize, { name: nameFilter, category: selectedCategory, availability: availabilityFilter }, sortBy, sortDir);
                   setProducts(updated);
                   //setFilteredProducts(updated);
                 }
@@ -203,10 +212,7 @@ function App() {
           }}
         />
       )}
-
-
     </div>
-
   );
 }
 

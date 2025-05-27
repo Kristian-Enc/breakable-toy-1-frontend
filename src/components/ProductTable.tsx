@@ -1,6 +1,6 @@
 /* THIS COMPONENT IS PRODUCING AN ERROR IN THE CONSOLE, DON'T FORGET TO CHECK IT */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { productService } from '../services/productService';
 import { Product } from '../types/Product';
 
@@ -9,11 +9,14 @@ type Props = {
   onToggleStock: (product: Product) => void;
   onEdit: (product: Product) => void;
   onDelete: (id: number) => void;
+  sortBy: string;
+  sortDir: string;
+  setSortBy: React.Dispatch<React.SetStateAction<string>>;
+  setSortDir: React.Dispatch<React.SetStateAction<string>>;
+  onSortChange: (field: string, direction: 'asc' | 'desc') => void; // <-- This line was added
 };
 
-
-const ProductTable = ({ products, onToggleStock, onEdit, onDelete }: Props) => {
-
+const ProductTable = ({ products, onToggleStock, onEdit, onDelete, sortBy, sortDir, setSortBy, setSortDir, onSortChange }: Props) => {
   const handleCheckboxChange = async (product: Product) => {
     try {
       if (product.quantityInStock === 0) {
@@ -36,6 +39,18 @@ const ProductTable = ({ products, onToggleStock, onEdit, onDelete }: Props) => {
     }
   };
 
+  const toggleSort = (field: string) => {
+    const isSameField = sortBy === field;
+    const newDirection = isSameField && sortDir === 'asc' ? 'desc' : 'asc';
+    setSortBy(field);
+    setSortDir(newDirection);
+    onSortChange(field, newDirection);
+  };
+
+  const renderSortArrow = (field: string) => {
+    if (sortBy !== field) return '';
+    return sortDir === 'asc' ? ' ▲' : ' ▼';
+  };
 
   return (
     <div>
@@ -44,11 +59,21 @@ const ProductTable = ({ products, onToggleStock, onEdit, onDelete }: Props) => {
         <thead>
           <tr>
             <th>Checkbox</th>
-            <th>Category</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Expiration Date</th>
-            <th>Stock</th>
+            <th onClick={() => toggleSort('category')} style={{ cursor: 'pointer' }}>
+              Category{renderSortArrow('category')}
+            </th>
+            <th onClick={() => toggleSort('name')} style={{ cursor: 'pointer' }}>
+              Name{renderSortArrow('name')}
+            </th>
+            <th onClick={() => toggleSort('price')} style={{ cursor: 'pointer' }}>
+              Price{renderSortArrow('price')}
+            </th>
+            <th onClick={() => toggleSort('expiration')} style={{ cursor: 'pointer' }}>
+              Expiration Date{renderSortArrow('expiration')}
+            </th>
+            <th onClick={() => toggleSort('stock')} style={{ cursor: 'pointer' }}>
+              Stock{renderSortArrow('stock')}
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -61,7 +86,6 @@ const ProductTable = ({ products, onToggleStock, onEdit, onDelete }: Props) => {
                   checked={product.quantityInStock === 0}
                   onChange={() => onToggleStock(product)}
                 />
-
               </td>
               <td>{product.category}</td>
               <td>{product.name}</td>
@@ -72,14 +96,12 @@ const ProductTable = ({ products, onToggleStock, onEdit, onDelete }: Props) => {
                 <button type="button" onClick={() => onEdit(product)}>Edit</button>
                 <button type="button" onClick={() => onDelete(product.id!)}>Delete</button>
               </td>
-
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   );
-
 }
 
-export default ProductTable
+export default ProductTable;
