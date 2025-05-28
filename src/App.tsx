@@ -29,20 +29,19 @@ function App() {
     setSortBy(field);
     setSortDir(direction);
   };
-  
+
+  const filters = {
+    name: nameFilter,
+    category: selectedCategory,
+    availability: availabilityFilter,
+  };
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const filters = {
-          name: nameFilter,
-          category: selectedCategory,
-          availability: availabilityFilter,
-        };
-
         const [data, totalCount] = await Promise.all([
           productService.getAll(currentPage, pageSize, filters, sortBy, sortDir),
-          productService.getTotalCount() // (optional: update this later to match filters)
+          productService.getTotalCount(filters)
         ]);
 
         setProducts(data);
@@ -107,8 +106,8 @@ function App() {
             }
 
             const [updated, totalCount] = await Promise.all([
-              productService.getAll(currentPage, pageSize, { name: nameFilter, category: selectedCategory, availability: availabilityFilter }, sortBy, sortDir),
-              productService.getTotalCount()
+              productService.getAll(currentPage, pageSize, filters, sortBy, sortDir),
+              productService.getTotalCount(filters)
             ]);
 
             setProducts(updated);
@@ -126,8 +125,8 @@ function App() {
           try {
             await productService.delete(id);
             const [updated, totalCount] = await Promise.all([
-              productService.getAll(currentPage, pageSize, { name: nameFilter, category: selectedCategory, availability: availabilityFilter }, sortBy, sortDir),
-              productService.getTotalCount()
+              productService.getAll(currentPage, pageSize, filters, sortBy, sortDir),
+              productService.getTotalCount(filters)
             ]);
 
             setProducts(updated);
@@ -184,14 +183,14 @@ function App() {
                   updatedAt: new Date().toISOString(),
                 });
 
-                const totalCount = await productService.getTotalCount();
+                const totalCount = await productService.getTotalCount(filters);
                 const newTotalPages = Math.ceil(totalCount / pageSize);
 
                 // If we’re already on the last page and it’s full, go to the new page
                 if (products.length === pageSize) {
                   setCurrentPage(newTotalPages - 1);
                 } else {
-                  const updated = await productService.getAll(currentPage, pageSize, { name: nameFilter, category: selectedCategory, availability: availabilityFilter }, sortBy, sortDir);
+                  const updated = await productService.getAll(currentPage, pageSize, filters, sortBy, sortDir);
                   setProducts(updated);
                   //setFilteredProducts(updated);
                 }

@@ -7,48 +7,66 @@ type Props = {
 };
 
 const Pagination = ({ currentPage, totalPages, onPageChange }: Props) => {
-  const renderPageButtons = () => {
-    const buttons = [];
+  const getPageNumbers = () => {
+    const pages = [];
 
-    const startPage = Math.max(0, currentPage);
-    const endPage = Math.min(totalPages - 1, currentPage + 2);
+    if (totalPages <= 7) {
+      for (let i = 0; i < totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage > 2) pages.push(0);
+      if (currentPage > 3) pages.push(-1); // means "..."
 
-    for (let i = startPage; i <= endPage; i++) {
-      buttons.push(
-        <button
-          key={i}
-          type="button"
-          onClick={() => onPageChange(i)}
-        >
-          {i + 1}
-        </button>
-      );
+      const start = Math.max(0, currentPage - 1);
+      const end = Math.min(totalPages, currentPage + 2);
+
+      for (let i = start; i < end; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage < totalPages - 3) pages.push(-2); // means "..."
+      if (currentPage < totalPages - 2) pages.push(totalPages - 1);
     }
 
-    return buttons;
+    return pages;
   };
 
   return (
     <div>
-      <button type="button" onClick={() => onPageChange(0)} disabled={currentPage === 0}>«</button>
-      {renderPageButtons()}
-      {currentPage + 3 < totalPages && (
-        <>
+      <button
+        type="button"
+        disabled={currentPage === 0}
+        onClick={() => onPageChange(currentPage - 1)}
+      >
+        «
+      </button>
+
+      {getPageNumbers().map((page, index) =>
+        page === -1 || page === -2 ? (
+          <span key={index} style={{ margin: '0 4px' }}>...</span>
+        ) : (
           <button
+            key={page}
             type="button"
-            onClick={() => {
-              const userPage = prompt("Enter page number:");
-              const page = Number(userPage) - 1;
-              if (!isNaN(page) && page >= 0 && page < totalPages) {
-                onPageChange(page);
-              }
+            onClick={() => onPageChange(page)}
+            style={{
+              fontWeight: page === currentPage ? 'bold' : 'normal',
+              margin: '0 2px'
             }}
           >
-            ...
+            {page + 1}
           </button>
-          <button type="button" onClick={() => onPageChange(totalPages - 1)}>»</button>
-        </>
+        )
       )}
+
+      <button
+        type="button"
+        disabled={currentPage === totalPages - 1}
+        onClick={() => onPageChange(currentPage + 1)}
+      >
+        »
+      </button>
     </div>
   );
 };

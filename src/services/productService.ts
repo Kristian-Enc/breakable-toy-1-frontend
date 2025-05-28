@@ -83,13 +83,26 @@ export const productService = {
     }
   },
 
-  async getTotalCount(): Promise<number> {
-    const response = await fetch(baseUrl);
-    if (!response.ok) {
-      throw new Error("Failed to fetch all products for counting");
+  async getTotalCount(
+    filters: { name?: string; category?: string; availability?: string } = {}
+  ): Promise<number> {
+    const params = new URLSearchParams();
+  
+    if (filters.name) params.append("name", filters.name);
+    if (filters.category && filters.category !== "All") {
+      params.append("category", filters.category);
     }
-    const data = await response.json();
-    return data.length;
+    if (filters.availability && filters.availability !== "All") {
+      const isAvailable = filters.availability === "Available";
+      params.append("availability", String(isAvailable));
+    }
+  
+    const response = await fetch(`${baseUrl}/count?${params}`);
+    if (!response.ok) {
+      throw new Error("Failed to count products");
+    }
+  
+    return response.json();
   },
 
   async getMetrics(): Promise<InventoryMetrics> {
