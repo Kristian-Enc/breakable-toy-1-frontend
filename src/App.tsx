@@ -1,3 +1,4 @@
+import './App.css';
 import React, { useState, useEffect } from "react";
 import { Product } from "./types/Product";
 import { productService } from "./services/productService";
@@ -74,7 +75,7 @@ function App() {
   // };
 
   return (
-    <div>
+    <div className="app-container">
       <FilterBar
         onSearchByName={(name: string) => {
           setNameFilter(name);

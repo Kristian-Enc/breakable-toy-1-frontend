@@ -53,9 +53,9 @@ const ProductTable = ({ products, onToggleStock, onEdit, onDelete, sortBy, sortD
   };
 
   return (
-    <div>
+    <div className="product-table-container">
       <h2>Inventory Products</h2>
-      <table>
+      <table className="product-table">
         <thead>
           <tr>
             <th>Checkbox</th>

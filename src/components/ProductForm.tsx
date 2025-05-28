@@ -29,8 +29,8 @@ const ProductForm = ({ onCancel, onSave, existingCategories, product }: Props) =
   const [expirationDate, setExpirationDate] = useState(product?.expirationDate ?? '');
   
   return (
-    <div>
-      <h2>Create / Edit a Product</h2>
+    <div className="modal-overlay">
+      <div className="modal">
       <form>
         <div>
           <label>
@@ -124,6 +124,7 @@ const ProductForm = ({ onCancel, onSave, existingCategories, product }: Props) =
           <button type="button" onClick={onCancel}>Cancel</button>
         </div>
       </form>
+      </div>
     </div>
   )
 }

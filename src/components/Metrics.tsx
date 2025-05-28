@@ -28,7 +28,7 @@ const Metrics = () => {
   return (
     <div>
       <h2>Inventory Overview</h2>
-      <table>
+      <table className="metrics-table">
         <thead>
           <tr>
             <th></th>

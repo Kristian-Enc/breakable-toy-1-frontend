@@ -33,8 +33,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: Props) => {
   };
 
   return (
-    <div>
-      <button
+    <div className="pagination">
+      <button className="page-button"
         type="button"
         disabled={currentPage === 0}
         onClick={() => onPageChange(currentPage - 1)}
@@ -43,31 +43,27 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: Props) => {
       </button>
 
       {getPageNumbers().map((page, index) =>
-        page === -1 || page === -2 ? (
-          <span key={index} style={{ margin: '0 4px' }}>...</span>
-        ) : (
-          <button
-            key={page}
-            type="button"
-            onClick={() => onPageChange(page)}
-            style={{
-              fontWeight: page === currentPage ? 'bold' : 'normal',
-              margin: '0 2px'
-            }}
-          >
-            {page + 1}
-          </button>
-        )
-      )}
-
+    page === -1 || page === -2 ? (
+      <span key={index} className="page-dots">...</span>
+    ) : (
       <button
-        type="button"
-        disabled={currentPage === totalPages - 1}
-        onClick={() => onPageChange(currentPage + 1)}
+        key={page}
+        className={`page-button ${page === currentPage ? 'active' : ''}`}
+        onClick={() => onPageChange(page)}
       >
-        »
+        {page + 1}
       </button>
-    </div>
+    )
+  )}
+
+  <button
+    className="page-button"
+    disabled={currentPage === totalPages - 1}
+    onClick={() => onPageChange(currentPage + 1)}
+  >
+    »
+  </button>
+</div>
   );
 };
 

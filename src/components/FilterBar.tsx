@@ -9,7 +9,6 @@ type Props = {
     onAvailabilityChange: (selected: string) => void;
 };
 
-
 const FilterBar = ({
     onSearchByName,
     categories,
@@ -21,54 +20,46 @@ const FilterBar = ({
     const [searchName, setSearchName] = useState('');
 
     return (
-        <div>
-            <h2>Search Product</h2>
-            <div>
-                <label>
-                    Name
-                    <input
-                        type='text'
-                        placeholder='Enter product name'
-                        value={searchName}
-                        onChange={(e) => setSearchName(e.target.value)} />
-                </label>
+        <div className="filter-bar">
+            <div className="form-group">
+                <label>Name</label>
+                <input
+                    type='text'
+                    placeholder='Enter product name'
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)} />
             </div>
 
-            <div>
-                <label>
-                    Category
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => onCategoryChange(e.target.value)}
-                    >
-                        <option value="All">All</option>
-                        {categories.map((category) => (
-                            <option key={category} value={category}>{category}</option>
-                        ))}
-                    </select>
-                </label>
+            <div className="form-group">
+                <label>Category</label>
+                <select
+                    value={selectedCategory}
+                    onChange={(e) => onCategoryChange(e.target.value)}
+                >
+                    <option value="All">All</option>
+                    {categories.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                    ))}
+                </select>
             </div>
 
-            <div>
-                <label>
-                    Availability
-                    <select
-                        value={selectedAvailability}
-                        onChange={(e) => onAvailabilityChange(e.target.value)}
-                    >
-                        <option value="All">All</option>
-                        <option value="Available">Available</option>
-                        <option value="Not Available">Not Available</option>
-                    </select>
-                </label>
+            <div className="form-group">
+                <label>Availability</label>
+                <select
+                    value={selectedAvailability}
+                    onChange={(e) => onAvailabilityChange(e.target.value)}
+                >
+                    <option value="All">All</option>
+                    <option value="Available">Available</option>
+                    <option value="Not Available">Not Available</option>
+                </select>
             </div>
 
-            <div>
+            <div className="form-group">
                 <button type='button' onClick={() => onSearchByName(searchName)}>Search</button>
             </div>
-
         </div>
-    )
+    );
 }
 
-export default FilterBar
+export default FilterBar;

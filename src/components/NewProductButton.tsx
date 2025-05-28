@@ -6,8 +6,8 @@ type Props = {
 
 const NewProductButton = ({ onClick }: Props) => {
   return (
-    <div>
-      <button type="button" onClick={onClick}>
+    <div className="new-product-button-wrapper">
+      <button className="new-product-button" type="button" onClick={onClick}>
         New Product
       </button>
     </div>
