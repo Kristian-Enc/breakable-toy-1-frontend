@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { productService } from '../services/productService';
 import { Product } from '../types/Product';
 
+
 type Props = {
   products: Product[];
   onToggleStock: (product: Product) => void;
@@ -52,13 +53,32 @@ const ProductTable = ({ products, onToggleStock, onEdit, onDelete, sortBy, sortD
     return sortDir === 'asc' ? ' ▲' : ' ▼';
   };
 
+  const getExpirationClass = (expirationDate?: string) => {
+    if (!expirationDate) return '';
+    const now = new Date();
+    const exp = new Date(expirationDate);
+    const diffDays = Math.ceil((exp.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return '';
+    if (diffDays < 7) return 'expired-soon';
+    if (diffDays <= 14) return 'expired-medium';
+    return 'expired-later';
+  };
+
+  const getStockCellClass = (stock: number) => {
+    if (stock === 0) return 'stock-none-cell';
+    if (stock < 5) return 'stock-low-cell';
+    if (stock <= 10) return 'stock-medium-cell';
+    return '';
+  };
+
   return (
     <div className="product-table-container">
       <h2>Inventory Products</h2>
       <table className="product-table">
         <thead>
           <tr>
-            <th>Checkbox</th>
+            <th></th>
             <th onClick={() => toggleSort('category')} style={{ cursor: 'pointer' }}>
               Category{renderSortArrow('category')}
             </th>
@@ -78,26 +98,31 @@ const ProductTable = ({ products, onToggleStock, onEdit, onDelete, sortBy, sortD
           </tr>
         </thead>
         <tbody>
-          {products.map(product => (
-            <tr key={product.id}>
-              <td>
-                <input
-                  type="checkbox"
-                  checked={product.quantityInStock === 0}
-                  onChange={() => onToggleStock(product)}
-                />
-              </td>
-              <td>{product.category}</td>
-              <td>{product.name}</td>
-              <td>${product.unitPrice.toFixed(2)}</td> {/* DON'T FORGET TO CHECK THAT THIS WORKS WELL!!! */}
-              <td>{product.expirationDate ?? '—'}</td> {/* DON'T FORGET TO CHECK THAT THIS WORKS WELL!!! */}
-              <td>{product.quantityInStock}</td>
-              <td>
-                <button type="button" onClick={() => onEdit(product)}>Edit</button>
-                <button type="button" onClick={() => onDelete(product.id!)}>Delete</button>
-              </td>
-            </tr>
-          ))}
+          {products.map(product => {
+            const expirationClass = getExpirationClass(product.expirationDate);
+            const stockCellClass = getStockCellClass(product.quantityInStock);
+
+            return (
+              <tr key={product.id} className={expirationClass}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={product.quantityInStock === 0}
+                    onChange={() => onToggleStock(product)}
+                  />
+                </td>
+                <td>{product.category}</td>
+                <td style={{ textDecoration: product.quantityInStock === 0 ? 'line-through' : 'none' }}>{product.name}</td>
+                <td>${product.unitPrice.toFixed(2)}</td> {/* DON'T FORGET TO CHECK THAT THIS WORKS WELL!!! */}
+                <td>{product.expirationDate ?? '—'}</td> {/* DON'T FORGET TO CHECK THAT THIS WORKS WELL!!! */}
+                <td className={stockCellClass}>{product.quantityInStock}</td>
+                <td>
+                  <button type="button" onClick={() => onEdit(product)}>Edit</button>
+                  <button type="button" onClick={() => onDelete(product.id!)}>Delete</button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

@@ -11,7 +11,6 @@ import ProductForm from "./components/ProductForm";
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
-  //const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [nameFilter, setNameFilter] = useState('');
@@ -59,40 +58,24 @@ function App() {
     fetchData();
   }, [currentPage, pageSize, nameFilter, selectedCategory, availabilityFilter, sortBy, sortDir]);
 
-  // const applyFilters = () => {
-  //   const filtered = products.filter(p => {
-  //     const matchesName = p.name.toLowerCase().includes(nameFilter.toLowerCase());
-  //     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-  //     const matchesAvailability =
-  //       availabilityFilter === 'All' ||
-  //       (availabilityFilter === 'Available' && p.quantityInStock > 0) ||
-  //       (availabilityFilter === 'Not Available' && p.quantityInStock === 0);
-
-  //     return matchesName && matchesCategory && matchesAvailability;
-  //   });
-
-  //   setFilteredProducts(filtered);
-  // };
-
   return (
     <div className="app-container">
-      <FilterBar
-        onSearchByName={(name: string) => {
-          setNameFilter(name);
-          //applyFilters();
-        }}
-        categories={categoryOptions}
-        selectedCategory={selectedCategory}
-        onCategoryChange={(selected: string) => {
-          setSelectedCategory(selected);
-          //applyFilters();
-        }}
-        selectedAvailability={availabilityFilter}
-        onAvailabilityChange={(selected: string) => {
-          setAvailabilityFilter(selected);
-          //applyFilters();
-        }}
-      />
+      <div className="product-table-container">
+        <FilterBar
+          onSearchByName={(name: string) => {
+            setNameFilter(name);
+          }}
+          categories={categoryOptions}
+          selectedCategory={selectedCategory}
+          onCategoryChange={(selected: string) => {
+            setSelectedCategory(selected);
+          }}
+          selectedAvailability={availabilityFilter}
+          onAvailabilityChange={(selected: string) => {
+            setAvailabilityFilter(selected);
+          }}
+        />
+      </div>
       <NewProductButton onClick={() => setShowForm(true)} />
       <ProductTable
         products={products}
@@ -112,7 +95,6 @@ function App() {
             ]);
 
             setProducts(updated);
-            //setFilteredProducts(updated);
             setTotalPages(Math.ceil(totalCount / pageSize));
           } catch (error) {
             console.error("Failed to toggle stock:", error);
@@ -131,7 +113,6 @@ function App() {
             ]);
 
             setProducts(updated);
-            //setFilteredProducts(updated);
             setTotalPages(Math.ceil(totalCount / pageSize));
 
           } catch (error) {
@@ -164,7 +145,6 @@ function App() {
           onSave={async (formData) => {
             try {
               if (productToEdit) {
-                // Edit mode
                 const updated = await productService.update(productToEdit.id!, {
                   ...formData,
                   updatedAt: new Date().toISOString(),
@@ -175,9 +155,7 @@ function App() {
                 );
 
                 setProducts(updatedList);
-                //setFilteredProducts(updatedList);
               } else {
-                // Create mode
                 const created = await productService.create({
                   ...formData,
                   createdAt: new Date().toISOString(),
@@ -187,17 +165,14 @@ function App() {
                 const totalCount = await productService.getTotalCount(filters);
                 const newTotalPages = Math.ceil(totalCount / pageSize);
 
-                // If we’re already on the last page and it’s full, go to the new page
                 if (products.length === pageSize) {
                   setCurrentPage(newTotalPages - 1);
                 } else {
                   const updated = await productService.getAll(currentPage, pageSize, filters, sortBy, sortDir);
                   setProducts(updated);
-                  //setFilteredProducts(updated);
                 }
                 setTotalPages(newTotalPages);
 
-                // Category check
                 if (!categoryOptions.includes(created.category)) {
                   setCategoryOptions((prev) => [...prev, created.category]);
                 }
